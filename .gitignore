@@ -1,0 +1,8 @@
+# Ignore access.log
+access.log
+
+# Ignore security.ini
+security.ini
+
+# Ignore security.ini.hash
+security.ini.hash

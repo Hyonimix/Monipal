@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="jp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monipal</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #2C2C2C;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            color: white;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            padding: 9px 0;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .island {
+            height: 100% !important;
+            width: 90%;
+            max-width: 90%;
+            padding: 20px;
+            margin-bottom: 10px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #333;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control,
+        .card {
+            background-color: #424242;
+            color: #ffffff;
+            height: auto;
+            resize: none;
+            overflow-y: hidden;
+            border: 2px solid skyblue;
+            transition: border-color 0.3s;
+        }
+
+        .row {
+            margin: 0 -10px;
+        }
+
+        .card {
+            background-color: #424242;
+            color: #ffffff;
+            height: auto;
+            resize: none;
+            overflow-y: hidden;
+            border: 2px solid skyblue;
+            transition: border-color 0.3s;
+            margin: 0;
+        }
+
+        .form-control::placeholder {
+            color: #cccccc;
+        }
+
+        .form-control:focus {
+            background-color: #424242;
+            color: #ffffff;
+            border-color: deepskyblue;
+            outline: none;
+        }
+
+        .half-width-card {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .full-width-card {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        button-container,
+        #shutdown-button-container,
+        #shutdown-Confirm-container,
+        #shutdown-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button-container>button,
+        #shutdown-confirm-container>button {
+            margin: 5px;
+        }
+
+        button.btn {
+            width: 150px;
+            text-align: center;
+            margin: 5px;
+        }
+
+        button.btn,
+        #initPw-confirm-container,
+        #login-button-container,
+        #shutdown-button-container,
+        #shutdown-confirm-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .fadeOut {
+            animation: fadeOut 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 2.5%;
+            width: 50%;
+            margin: auto;
+            text-align: center;
+        }
+
+        @media (max-height: 800px) {
+            footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <div class="header fade-in">Monipal : System Monitor on Web</div>
+
+    <!-- 초기 비밀번호 설정 -->
+    <div class="container island" id="setup-section" style="display: none;">
+        <h3 class="mt-3 text-center">Welcome!</h3>
+        <form id="setup-password-form" class="mt-4">
+            <div class="form-group">
+                <input type="password" class="form-control" id="newPassword"
+                    placeholder="Enter to Set Initial Password..." required>
+            </div>
+            <div id="initPw-confirm-container" class="mt-4">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 로그인 -->
+    <div class="container island" id="login-section" style="display: none;">
+        <h3 class="mt-3 text-center">Please Login to Continue</h3>
+        <form id="login-form" class="mt-4">
+            <div class="form-group">
+                <input type="password" class="form-control" id="inputPassword"
+                    placeholder="Enter Password to Authentication..." required>
+            </div>
+            <div id="login-button-container" class="mt-4">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 시스템 정보 출력 -->
+    <div class="container island" id="monitor-section" class="mt-5" style="display: none;">
+        <h3 class="mt-3 text-center">System Information</h3>
+        <div class="row mt-4">
+            <div class="full-width-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">CPU</h5>
+                        <p class="card-text" id="cpu-model">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="half-width-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Host Name</h5>
+                        <p class="card-text" id="hostname">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="half-width-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Uptime</h5>
+                        <p class="card-text" id="uptime">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="half-width-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">CPU Usage</h5>
+                        <p class="card-text" id="cpu-usage">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="half-width-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Memory Usage</h5>
+                        <p class="card-text" id="memory-usage">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 셧다운 버튼 -->
+        <div id="shutdown-button-container" class="mt-4">
+            <button class="btn btn-warning" onclick="showShutdownForm()">Shutdown</button>
+        </div>
+        <div id="shutdown-section" class="mt-4" style="display: none;">
+            <form id="shutdown-form">
+                <div class="form-group">
+                    <input type="password" class="form-control" id="shutdownPassword"
+                        placeholder="Enter Password to shutdown server..." required>
+                </div>
+                <div id="shutdown-confirm-container" class="mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="hideShutdownForm()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <footer class="container mt-4 text-muted">
+        D5 Kan<br>
+        github.com/Hyonimix<br>
+        CC-BY-NC-ND
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 초기 비밀번호 설정
+            document.getElementById('setup-password-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const newPassword = document.getElementById('newPassword').value;
+                fetch('/setup-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            fadeOut(document.getElementById('setup-section'), function () {
+                                fadeIn(document.getElementById('login-section'));
+                            });
+                        } else {
+                            alert('Password setup failed.');
+                        }
+                    });
+            });
+
+            // 설정된 비밀번호가 있는지 확인 후 로그인 섹션으로 넘김
+            fetch('/initial-setup')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.initialSetupComplete) {
+                        fadeIn(document.getElementById('login-section'));
+                    } else {
+                        fadeIn(document.getElementById('setup-section'));
+                    }
+                });
+        });
+
+        // 로그인 상태
+        let isAuthenticated = false;
+
+        // 로그인 및 시스템 상태 표시
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const password = document.getElementById('inputPassword').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        isAuthenticated = true;
+                        fadeOut(document.getElementById('login-section'), function () {
+                            fadeIn(document.getElementById('monitor-section'));
+                            loadSystemInfo();
+                            setInterval(loadSystemInfo, 3000); // 인터벌 (ms)
+                        });
+                    } else {
+                        alert('Invalid password');
+                    }
+                });
+        });
+
+        // 시스템 정보 불러오기
+        function loadSystemInfo() {
+            if (!isAuthenticated) return;
+
+            fetch('/sysinfo')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.getElementById('hostname').innerText = data.hostname;
+                    document.getElementById('cpu-model').innerText = data.cpuModel;
+                    document.getElementById('uptime').innerText = data.uptime;
+                    document.getElementById('cpu-usage').innerText = data.cpuUsage;
+                    document.getElementById('memory-usage').innerText = data.usedMem + ' / ' + data.totalMem;
+                })
+                .catch(error => console.error('Error fetching system info:', error));
+        }
+
+        // 서버 셧다운 폼 보이기
+        function showShutdownForm() {
+            fadeIn(document.getElementById('shutdown-section'));
+        }
+
+        // 서버 셧다운 폼 숨기기
+        function hideShutdownForm() {
+            fadeOut(document.getElementById('shutdown-section'));
+        }
+        document.getElementById('shutdown-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const password = document.getElementById('shutdownPassword').value;
+            fetch('/shutdown', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Invalid password');
+                    }
+                });
+        });
+
+        // 페이드 인아웃 헬퍼
+        function fadeIn(element, callback) {
+            element.style.display = 'block';
+            element.classList.remove('fadeOut');
+            element.classList.add('fadeIn');
+            if (callback) {
+                element.addEventListener('animationend', function handler() {
+                    element.removeEventListener('animationend', handler);
+                    callback();
+                });
+            }
+        }
+        function fadeOut(element, callback) {
+            element.classList.remove('fadeIn');
+            element.classList.add('fadeOut');
+            element.addEventListener('animationend', function handler() {
+                element.style.display = 'none';
+                element.removeEventListener('animationend', handler);
+                if (callback) {
+                    callback();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
