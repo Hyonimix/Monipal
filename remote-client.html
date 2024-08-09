@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
@@ -218,49 +218,62 @@
         document.getElementById('ipForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             const ip = document.getElementById('ipInput').value;
-            const targetUrl = `http://${ip}:7359`;
+            const httpsUrl = `https://${ip}:8443`;
+            const httpUrl = `http://${ip}:7359`;
 
             document.getElementById('loadingSpinner').style.display = 'block';
             document.getElementById('status').innerText = '';
 
             // CORS 제한 회피
-            try {
-                const response = await fetch(targetUrl, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
+            async function tryConnection(url) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'no-cors'
+                    });
 
-                // 연결 체크
-                if (response.ok || response.type === 'opaque') {
-                    document.getElementById('loadingSpinner').style.display = 'block';
+                    // 연결 체크
+                    if (response.ok || response.type === 'opaque') {
+                        document.getElementById('loadingSpinner').style.display = 'block';
 
-                    // 페이드 아웃
-                    document.getElementById('connectionForm').classList.add('fade-out');
+                        // 페이드 아웃
+                        document.getElementById('connectionForm').classList.add('fade-out');
 
-                    setTimeout(() => {
-                        document.getElementById('header').style.display = 'none';
-                        document.getElementById('connectionForm').style.display = 'none';
-                        document.getElementById('footer').style.display = 'none';
+                        setTimeout(() => {
+                            document.getElementById('header').style.display = 'none';
+                            document.getElementById('connectionForm').style.display = 'none';
+                            document.getElementById('footer').style.display = 'none';
 
-                        const iframeContainer = document.getElementById('iframeContainer');
-                        const iframe = document.createElement('iframe');
-                        iframe.src = targetUrl;
-                        iframe.style.width = '100%';
-                        iframe.style.height = '100%';
-                        iframe.style.border = 'none';
+                            const iframeContainer = document.getElementById('iframeContainer');
+                            const iframe = document.createElement('iframe');
+                            iframe.src = url;
+                            iframe.style.width = '100%';
+                            iframe.style.height = '100%';
+                            iframe.style.border = 'none';
 
-                        iframe.onload = () => {
-                            document.getElementById('loadingSpinner').style.display = 'none';
-                        };
+                            iframe.onload = () => {
+                                document.getElementById('loadingSpinner').style.display = 'none';
+                            };
 
-                        iframeContainer.appendChild(iframe);
-                        iframeContainer.style.display = 'block';
-                    }, 500);
-                } else {
-                    throw new Error('Connection failed');
+                            iframeContainer.appendChild(iframe);
+                            iframeContainer.style.display = 'block';
+                        }, 500);
+                    } else {
+                        throw new Error('Connection failed: ' + response.statusText);
+                    }
+                } catch (error) {
+                    return false;
                 }
-            } catch (error) {
-                document.getElementById('status').innerText = 'Connection failed. \nError: ' + error.message;
+                return true;
+            }
+
+            const httpsSuccess = await tryConnection(httpsUrl);
+            if (!httpsSuccess) {
+                const httpSuccess = await tryConnection(httpUrl);
+                if (!httpSuccess) {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('status').innerText = 'Connection failed on both HTTPS and HTTP.';
+                }
             }
         });
     </script>

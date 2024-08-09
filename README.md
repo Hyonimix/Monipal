@@ -1,9 +1,9 @@
 # Monipal
-[Download](https://github.com/Hyonimix/Monipal/releases/download/v1.0.0/monipal-1.0.0.zip)
+[Download](https://github.com/Hyonimix/Monipal/releases/download/v1.0.1/monipal-1.0.1.zip)
 
 ## 特徴
 システムのリアルタイム情報を取得し、HTTPおよびHTTPSを通じて提供する。<br>
-デスクトップ環境とローカルネットワーク内の他のデバイスで効率的にシステム情報を管理できる。
+デスクトップ環境とローカルネットワーク内の他のデバイスで効率的にシステム情報が管理できる。
 
 ## 使用方法
 1. Windows環境では、`WINServer.bat`ファイルをダブルクリックしてサーバーを起動する。<br>
